@@ -31,31 +31,30 @@ resource "oci_identity_dynamic_group" "operator_group" {
   count = var.enable_operator_instance_principal == true ? 1 : 0
 }
 
-#resource "oci_identity_policy" "operator_group_policy" {
-#  provider = oci.home
+resource "oci_identity_policy" "operator_group_policy" {
+  provider = oci.home
 
-#  compartment_id = var.compartment_id
-#  description    = "policy to allow operator host to call services"
-#  name           = join("-", compact([
-#    random_id.dynamic_group_suffix.keepers.label_prefix,
-#    "operator-instance-principal",
-#    random_id.dynamic_group_suffix.hex
-#  ]))
-#  statements     = ["Allow dynamic-group ${oci_identity_dynamic_group.operator_group[0].name} to manage all-resources in compartment id ${var.compartment_id}"]
+  compartment_id = var.compartment_id
+  description    = "policy to allow operator host to call services"
+  name           = join("-", compact([
+    random_id.dynamic_group_suffix.keepers.label_prefix,
+    "operator-instance-principal",
+    random_id.dynamic_group_suffix.hex
+  ]))
+  statements     = ["Allow dynamic-group ${oci_identity_dynamic_group.operator_group[0].name} to manage all-resources in compartment id ${var.compartment_id}"]
 
-#  lifecycle {
-#    ignore_changes = [name]
-#  }
+  lifecycle {
+    ignore_changes = [name]
+  }
+  count = var.enable_operator_instance_principal == true ? 1 : 0
+}
 
-#  count = var.enable_operator_instance_principal == true ? 1 : 0
-#}
+moved {
+  from = oci_identity_policy.enable_operator_instance_principal
+  to = oci_identity_policy.operator_group_policy
+}
 
-#moved {
-#  from = oci_identity_policy.enable_operator_instance_principal
-#  to = oci_identity_policy.operator_group_policy
-#}
-
-#moved {
-#  from = oci_identity_dynamic_group.enable_operator_instance_principal
-#  to = oci_identity_dynamic_group.operator_group
-#}
+moved {
+  from = oci_identity_dynamic_group.enable_operator_instance_principal
+  to = oci_identity_dynamic_group.operator_group
+}
